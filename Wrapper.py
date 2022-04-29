@@ -58,7 +58,11 @@ def main():
     R_set, T_set = get_RTset(E_matrix)
 
     #Linear Triangulation 
-
+    find_idx = np.logical_and(features_filtered[:,0],features_filtered[:,1])
+    index = np.where(find_idx == True)
+    index = np.array(index).reshape(-1)
+    pt1 = np.hstack((features_x[index,0].reshape((-1, 1)), features_y[index,0].reshape((-1, 1))))
+    pt2 = np.hstack((features_x[index,1].reshape((-1, 1)), features_y[index,1].reshape((-1, 1))))
     point3D_set = linear_triangulation(R_set,T_set,pt1,pt2,k)
 
     #Get pose of camera using cheirality condition
