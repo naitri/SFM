@@ -9,6 +9,7 @@ from GetInliersRANSAC import *
 from EssentialMatrixFromFundamentalMatrix import *
 from ExtractCameraPose import *
 from LinearTriangulation import *
+from DisambiguateCameraPose import *
 def main():
 
     k =  np.array([[568.996140852, 0 ,643.21055941],
@@ -60,6 +61,8 @@ def main():
 
     point3D_set = linear_triangulation(R_set,T_set,pt1,pt2,k)
 
+    #Get pose of camera using cheirality condition
+    R_best, T_best = extract_pose(R_set,T_set,point3D_set)
 
 
     
