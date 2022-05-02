@@ -19,7 +19,6 @@ def ransac(pt1,pt2,index):
         img2_8pt = pt2[random,:]
        
         F_est = estimate_Fmatrix(img1_8pt,img2_8pt)
-
         for j in range(n_rows):
             x1 = pt1[j,:]
             x2 = pt2[j,:]
@@ -36,7 +35,7 @@ def ransac(pt1,pt2,index):
             final_indices = indices
             F = F_est
 
- 
+   
   
 
     return np.array(final_indices),np.array(F).reshape((3,3))

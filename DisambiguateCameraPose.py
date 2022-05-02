@@ -9,7 +9,7 @@ def compute_cheriality(pt,r3,t):
     return count_depth
 
 def extract_pose(R_set,T_set,pts_3d_set):
-  
+    threshold = 0
     #Four sets are available for each possibility
     for i in range(len(R_set)):
         R = R_set[i]
@@ -25,5 +25,6 @@ def extract_pose(R_set,T_set,pts_3d_set):
 
     R_best = R_set[index]
     T_best = T_set[index]
+    X_best = pts_3d_set[index]
 
-    return R_best,T_best
+    return R_best,T_best,X_best

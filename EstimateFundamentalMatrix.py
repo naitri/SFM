@@ -29,13 +29,11 @@ def estimate_Fmatrix(img1_pts,img2_pts):
     #normalize points
     img1_pts,T1 = normalize_points(img1_pts)
     img2_pts,T2 = normalize_points(img2_pts)
-
     x1 = img1_pts[:,0]
     y1 = img1_pts[:,1]
     x1dash = img2_pts[:,0]
     y1dash = img2_pts[:,1]
     A = np.zeros((len(x1),9))
-
     for i in range(len(x1)):
         A[i] = np.array([x1dash[i]*x1[i],x1dash[i]*y1[i],x1dash[i], y1dash[i]*x1[i],y1dash[i]*y1[i],y1dash[i],x1[i],y1[i],1])
 
@@ -54,5 +52,6 @@ def estimate_Fmatrix(img1_pts,img2_pts):
     F = np.dot(ua,np.dot(sa,va))
     # F, mask = cv2.findFundamentalMat(img1_pts,img2_pts,cv2.FM_LMEDS)
     F = np.dot(T2.T, np.dot(F, T1))
+    F = F / F[2,2]
 
     return F

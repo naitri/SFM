@@ -38,12 +38,13 @@ def point_triangulation(k,pt1,pt2,R1,C1,R2,C2):
 
         _, _, v = np.linalg.svd(A)
         x_ = v[-1,:]
+        
         x_ = x_/x_[-1]
-        x_ = x_[:3]
+        x_ =x_[:3]
         points_3d.append(x_)
 
 
-    return points_3d
+    return np.array(points_3d)
 
 def linear_triangulation(R_Set,T_Set,pt1,pt2,k):
     R1_ = np.identity(3)
