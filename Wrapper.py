@@ -15,6 +15,7 @@ from NonlinearTriangulation import *
 from PnPRANSAC import *
 from NonlinearPnP import *
 from BuildVisibilityMatrix import *
+from BundleAdjustment import *
 def main():
 
     k =  np.array([[568.996140852, 0 ,643.21055941],
@@ -136,6 +137,7 @@ def main():
             continue
 
         x_img = np.transpose([features_x[idx, i], features_y[idx, i]])
+
         x_world = points_3D[idx, :]
 
         r, c = PnPRANSAC(x_world, x_img, k)
@@ -158,10 +160,11 @@ def main():
 
             X_new = linear_triangulation(R_matrices[j], C_matrices[j], r, c, pts1, pts2, k)
 
-            X_new = non_linear_triangulation(R_matrices[j], C_matrices[j], r, c, pts1, pts2, X_new, k)
+            # X_new = non_linear_triangulation(R_matrices[j], C_matrices[j], r, c, pts1, pts2, X_new, k)
 
-            points_3D[idx, :] = X_new[:, :-1]
-            # points_3D[idx, :] = X_new
+            # points_3D[idx, :] = X_new[:, :-1]
+            # COMMENT NEXT LINE FOR INCLUDING NONLINEAR TRIANGULATION AND UNCOMMENT THE PREVIOUS TWO LINES
+            points_3D[idx, :] = X_new
             reconstruction[idx] = 1
             vis_matrix[idx, img_indices[j]] = 1
             vis_matrix[img_indices, j] = 1
@@ -172,11 +175,17 @@ def main():
                 reconstruction[b] = 0
 
         bundle = BuildVisibilityMatrix(vis_matrix, img_indices)
-        point_idx = np.where(reconstruction == 1)
+
+        point_idx, _ = np.where(reconstruction == 1)
         camera_idx = i * np.ones((len(point_idx), 1))
         points2D = np.hstack((features_x[point_idx, i].reshape(-1, 1), features_x[point_idx, i].reshape(-1, 1)))
 
-        # TO-DO: Bundle Adjustment
+        R_matrices, C_matrices, points_3D = BundleAdjustment(C_matrices, R_matrices, points_3D, k, points2D, camera_idx, reconstruction, bundle)
+
+    idx, _ = np.where(reconstruction == 1)
+
+    points_3D = points_3D[idx, :]
+
 
 
 if __name__ == '__main__':
