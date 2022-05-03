@@ -69,15 +69,15 @@ def BundleAdjustment(C_set, R_set, x_world, K, x_img, camera_idx, reconstruction
 
 	num_cameras = camera_params.shape[0]
 
-	assert len(C_set) == num_cameras, "length not matched"
+	assert len(C_set) == num_cameras, "error: length not matched"
 
 	num_points = points_3d.shape[0]
 
 	n = 9 * num_cameras + 3 * num_points
 	m = 2 * x_img.shape[0]
 
-	print("n_cameras: {}".format(num_cameras))
-	print("n_points: {}".format(num_points))
+	print("Number of cameras: {}".format(num_cameras))
+	print("Number of points: {}".format(num_points))
 	print("Total number of parameters: {}".format(n))
 	print("Total number of residuals: {}".format(m))
 	opt = False
@@ -95,7 +95,6 @@ def BundleAdjustment(C_set, R_set, x_world, K, x_img, camera_idx, reconstruction
 		    ftol=1e-4,
 		    method='trf',
 		    args=(num_cameras, num_points, camera_idx, point_idx, x_world))
-		breakpoint()
 
 		parameters = res.x
 
