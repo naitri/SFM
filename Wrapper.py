@@ -81,13 +81,18 @@ def main():
     pt1 = np.hstack((features_x[index,0].reshape((-1, 1)), features_y[index,0].reshape((-1, 1))))
     pt2 = np.hstack((features_x[index,1].reshape((-1, 1)), features_y[index,1].reshape((-1, 1))))
 
-    #Linear Triangulation 
-    point3D_set = linear_triangulation(np.identity(3), np.zeros((3,1)), R_set,T_set,pt1,pt2,k)
-  
+    #Linear Triangulation
+    point3D_set = []
+
+    for i in range(4):
+        point3D_set.append(linear_triangulation(np.identity(3), np.zeros((3,1)), R_set[i],T_set[i],pt1,pt2,k))
+
+
     # #Get pose of camera using cheirality condition
     R_best, T_best,X = extract_pose(R_set,T_set,point3D_set)
 
     #Non-Linear Triangulation
+
     X_ = non_linear_triangulation(np.identity(3), np.zeros((3,1)), R_best,T_best,pt1,pt2,X,k)
    
     # Plotting non linear triangulation output
@@ -119,6 +124,7 @@ def main():
     img_indices = [0, 1]
 
     for i in range(n_imgs):
+        print(i)
         if np.isin(img_indices, i)[0]:
             continue
 
@@ -149,19 +155,21 @@ def main():
 
             pts1 = np.hstack((features_x[idx, img_indices[j]].reshape(-1, 1), features_y[idx, img_indices[j]].reshape(-1, 1)))
             pts2 = np.hstack((features_x[idx, i].reshape(-1, 1), features_y[idx, i].reshape(-1, 1)))
-            breakpoint()
 
-            X_new = linear_triangulation(r, c, R_matrices, C_matrices, pts1, pts2, k)
-            # X_new = non_linear_triangulation(R1, T1, R, T, pts1, pts2, X_new, k)
-            points_3D[idx, :] = X_new
+            X_new = linear_triangulation(R_matrices[j], C_matrices[j], r, c, pts1, pts2, k)
+
+            X_new = non_linear_triangulation(R_matrices[j], C_matrices[j], r, c, pts1, pts2, X_new, k)
+
+            points_3D[idx, :] = X_new[:, :-1]
+            # points_3D[idx, :] = X_new
             reconstruction[idx] = 1
             vis_matrix[idx, img_indices[j]] = 1
             vis_matrix[img_indices, j] = 1
 
-        for k in range(len(points_3D)):
-            if points_3D[k, 2] < 0:
-                vis_matrix[k, :] = 0
-                reconstruction[k] = 0
+        for b in range(len(points_3D)):
+            if points_3D[b, 2] < 0:
+                vis_matrix[b, :] = 0
+                reconstruction[b] = 0
 
         bundle = BuildVisibilityMatrix(vis_matrix, img_indices)
         point_idx = np.where(reconstruction == 1)

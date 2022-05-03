@@ -12,7 +12,7 @@ def non_linear_triangulation(R1, T1, R,T,pt1,pt2,X,k):
 
     I = np.identity(3)
     #calculating projection matrix P = K[R|T]
-    P1 = np.dot(k,np.dot(R1,np.hstack((I,-T1))))
+    P1 = np.dot(k,np.dot(R1,np.hstack((I,-T1.reshape(3, 1)))))
     P2 = np.dot(k,np.dot(R2,np.hstack((I,-T2))))
 
     #calculate new 3D points as per reprojection error

@@ -49,9 +49,9 @@ def point_triangulation(k,pt1,pt2,R1,C1,R2,C2):
 def linear_triangulation(R1, T1, R_Set,T_Set,pt1,pt2,k):
     # R1_ = np.identity(3)
     # T1_ = np.zeros((3,1))
-    points_3d_set = []
-    for i in range(len(R_Set)):
-        points3d = point_triangulation(k, pt1, pt2, R1, T1, R_Set[i], T_Set[i])
-        points_3d_set.append(points3d)
+    # points_3d_set = []
+    # for i in range(len(R_Set)):
+    points_3d = point_triangulation(k, pt1, pt2, R1, T1, R_Set, T_Set)
+    # points_3d_set.append(points3d)
 
-    return points_3d_set
+    return points_3d
