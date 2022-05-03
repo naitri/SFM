@@ -14,16 +14,33 @@ def non_linear_triangulation(R,T,pt1,pt2,X,k):
     #calculating projection matrix P = K[R|T]
     P1 = np.dot(k,np.dot(R1,np.hstack((I,-T1))))
     P2 = np.dot(k,np.dot(R2,np.hstack((I,-T2))))
-
     #calculate new 3D points as per reprojection error
     points3D_new_set = []
-    X = np.hstack((X, np.ones((len(X),1))))
+    # X = np.hstack((X, np.ones((len(X),1))))
     for i in range(len(X)):
-        opt = scipy.optimize.least_squares(fun=loss,x0 = X[i],method="trf",args = [pt1[i], pt2[i],P1,P2])
+        opt = scipy.optimize.least_squares(fun=loss,x0 = X[i],args = [pt1[i], pt2[i],P1,P2])
         points3D_new = opt.x
-        points3D_new=points3D_new / points3D_new[-1]
+        # points3D_new=points3D_new / points3D_new[-1]
         points3D_new_set.append(points3D_new)
     return np.array(points3D_new_set)
+
+def mean_error(R,T,pt1,pt2,X,k):
+
+    R1 = np.identity(3)
+    T1 = np.zeros((3,1))
+    R2 = R.reshape((3,3))
+    T2 = T.reshape((3,1))
+
+    I = np.identity(3)
+    #calculating projection matrix P = K[R|T]
+    P1 = np.dot(k,np.dot(R1,np.hstack((I,-T1))))
+    P2 = np.dot(k,np.dot(R2,np.hstack((I,-T2))))
+
+    e = []
+    for i in range(len(X)):
+        error = loss(X[i],pt1[i],pt2[i],P1,P2)
+        e.append(error/len(X))
+    return np.mean(e)
 
 def loss(X,pt1,pt2,P1,P2):
     p11,p12,p13 = P1
@@ -52,5 +69,5 @@ def loss(X,pt1,pt2,P1,P2):
     error2 = np.square(u2-u2_) + np.square(v2-v2_)
     error = error2 + error1
     
-    return error.squeeze()
+    return error
 

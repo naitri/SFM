@@ -4,7 +4,7 @@ import cv2
 
 def get_RTset(E):
 
-    U, S, V = np.linalg.svd(E,full_matrices=True)
+    U, S, V = np.linalg.svd(E)
     W = np.array([[0,-1,0],[1,0,0],[0,0,1]])
 
     R1 = np.dot(U,np.dot(W,V))
