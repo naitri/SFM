@@ -5,7 +5,7 @@ def compute_cheriality(pt,r3,t):
     count_depth = 0
     for xy in pt:
       
-        if np.dot(r3,(xy[:3]-t)) > 0:
+        if np.dot(r3,(xy[:3]-t)) > 0 and t[2] > 0:
             count_depth +=1
     return count_depth
 
@@ -21,6 +21,7 @@ def extract_pose(R_set,T_set,pts_3d_set):
 
         #calculating which R satisfies the condition
         num_depth_positive = compute_cheriality(pt3d,r3,T)
+        print(num_depth_positive)
         if num_depth_positive > threshold:
             index = i 
             threshold = num_depth_positive

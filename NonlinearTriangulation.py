@@ -39,7 +39,7 @@ def mean_error(R,T,pt1,pt2,X,k):
     e = []
     for i in range(len(X)):
         error = loss(X[i],pt1[i],pt2[i],P1,P2)
-        e.append(error/len(X))
+        e.append(error)
     return np.mean(e)
 
 def loss(X,pt1,pt2,P1,P2):
@@ -56,7 +56,7 @@ def loss(X,pt1,pt2,P1,P2):
    
     #for camera 2
     u2 = pt2[0]
-    v2 = pt2[0]
+    v2 = pt2[1]
     u1_ = np.divide(np.dot(p11,X),np.dot(p13,X))
     v1_ = np.divide(np.dot(p12,X),np.dot(p13,X))
    

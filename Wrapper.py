@@ -14,6 +14,8 @@ from LinearTriangulation import *
 from DisambiguateCameraPose import *
 from NonlinearTriangulation import *
 from Plotting import *
+from PnPRANSAC import *
+from NonlinearPnP import *
 def main():
 
     k =  np.array([[568.996140852, 0 ,643.21055941],
@@ -68,7 +70,7 @@ def main():
     file_name = "matches" +str(12)+".txt"
     points1,points2 = get_pts(folder, file_name)
     point1_fil,point2_fil,F_best = ransac(points1,points2)
-
+    # F_best = estimate_Fmatrix(point1_fil,point2_fil)
     F_matrix = F_best
     print(F_matrix)
     
@@ -83,19 +85,21 @@ def main():
 
     # # #Linear Triangulation 
     point3D_set = linear_triangulation(R_set,T_set,point1_fil,point2_fil,k)
-  
+    
+    plot_poses(R_set,T_set,point3D_set)
+
     # # # #Get pose of camera using cheirality condition
     R_best, T_best,X_ ,index= extract_pose(R_set,T_set,point3D_set)
+
     
-    #plot all poses
-    plot_poses(R_set,T_set,point3D_set)
+    # plot_selectedpose(T_best,R_best,X_,index)
+   
+    
 
     # # #Non-Linear Triangulation
     X_nl = non_linear_triangulation(R_best,T_best,point1_fil,point2_fil,X_,k)
     
-    #plot linear vs non linear
-    linear_nonlinear(X_,X_nl,index)
-
+    plot_linear_nonlinear(X_,X_nl,index)
     # # #calculate error
     error_prior = mean_error(R_best,T_best,point1_fil,point2_fil,X_,k)
     print(error_prior)
@@ -108,18 +112,48 @@ def main():
 
     T0 = np.zeros(3)
     R0 = np.identity(3)
-    T_set_.append(C0)
+    T_set_.append(T0)
     R_set_.append(R0)
 
     T_set_.append(T_best)
     R_set_.append(R_best)
 
+    #Corresponding 3D points are required for all images
+    #Hence, taking reference of initial image, 
+
+    #Rest of the pipeline computes from image 3 onwards where reference image will me image2
+
+    #Algorithm:
+    '''
+    1) Compute 2d and corresponding 3d points of reference image
+    2) Get matches of reference image and new image
+    3) COmpute 3D points for new image
+    '''
+
     for i in range(2,n_imgs):
 
-        file_name = "ransac" +str(i)+str(i+1)+".txt"
-        points1,points2 = get_ransac_pts(folder, file_name)
 
-    
+        file_name = "ransac" +str(i)+str(i+1)+".txt"
+        print(file_name)
+        points1,points2 = get_ransac_pts(folder, file_name)
+        img3_2d,img3_3d = compute_correspondences(point2_fil,X_nl,points1,points2)
+        
+        print("Computing poses using PnP")
+        R_new,T_new = PnPRANSAC(img3_3d, img3_2d, k)
+        P = projection_matrix(k,R_new,T_new)
+        pnp_error = np.mean(error(img3_2d, P, img3_3d))
+        print(pnp_error)
+        R_new, T_new = NonlinearPnP(img3_3d, img3_2d, k, T_new, R_new)
+        P = projection_matrix(k,R_new,T_new)
+        nonpnp_error = np.mean(error(img3_2d, P, img3_3d))
+        print(nonpnp_error)
+        
+
+
+        #Triangulating points
+        for j in range(1,i):
+
+
 
 if __name__ == '__main__':
     main()
